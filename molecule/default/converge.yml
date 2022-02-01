@@ -2,6 +2,6 @@
 - name: Converge
   hosts: all
   tasks:
-    - name: "Include ansible_rtorrent"
+    - name: "Include rtorrent"
       include_role:
-        name: "ansible_rtorrent"
+        name: "rtorrent"
