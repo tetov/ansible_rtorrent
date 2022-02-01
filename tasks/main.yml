@@ -1,2 +1,14 @@
 ---
-# tasks file for ansible_rtorrent
+- block:
+    - name: install packages
+      ansible.builtin.package:
+        name:
+          - rtorrent
+          - nodejs
+
+    - name: setup user
+      ansible.builtin.user:
+        name: rtorrent
+        shell: /bin/nologin
+        home: /var/lib/flood
+
