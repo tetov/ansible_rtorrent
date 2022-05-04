@@ -1,14 +1,52 @@
 ---
-- block:
+- name: rtorrent
+  block:
     - name: install packages
       ansible.builtin.package:
-        name:
-          - rtorrent
-          - nodejs
+        name: rtorrent-{{ version }}
 
-    - name: setup user
+    - name: create rtorrent user
       ansible.builtin.user:
-        name: rtorrent
+        name: torrent
+        create_home: true
+        home: /var/lib/rtorrent
         shell: /bin/nologin
-        home: /var/lib/flood
 
+    - name: copy rc
+      ansible.builtin.copy:
+        src: rtorrent.rc
+        dest: /etc/rtorrent.rc
+        mode: 0644
+
+    - name: copy systemd unit
+      ansible.builtin.copy:
+        src: rtorrent@.service
+        dest: /etc/systemd/system/rtorrent@.service
+        mode: 0644
+
+    - name: start and enable systemd unit
+      ansible.builtin.systemd:
+        name: rtorrent@torrent.service
+        enabled: true
+        state: started
+        daemon_reload: true
+
+  become: true
+
+- name: flood
+  block:
+    - name: enable copr package
+      community.general.copr:
+        name: '@tetov/flood'
+        state: enabled
+
+    - name: install package
+      ansible.builtin.dnf:
+        name: flood
+
+    - name: start and enable systemd unit
+      ansible.builtin.systemd:
+        name: flood@flood.service
+        enabled: true
+        state: started
+        daemon_reload: true
